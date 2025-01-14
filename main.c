@@ -123,9 +123,46 @@ int isPalindrome()
 
 //-----Arrays and String-----
 
+int sumOfArray()
+{
+    int i, sum = 0;
+    int arr[5] = {7,9,4,6,1};
+
+    for(i = 0; i < 5; i++)
+    {
+        sum += arr[i];
+    }
+
+    return sum;
+}
+
+void reverseArray()
+{
+    int i;
+    const int size = 5;
+    int arr[5] = {7,9,4,6,1};
+    int revArr[size];
+
+    for(i = 0; i < size; i++)
+    {
+        revArr[size-i - 1] = arr[i];
+    }
+
+    for(i = 0; i < size; i++)
+    {
+        printf("arr[%d]: %d\ninv arr[%d]: %d \n",i,arr[i],i,revArr[i]);
+    }
+}
+
+void stringManipulation()
+{
+    char string[6] = "Hello";
+    char string2[5] = "world";
+
+}
+
 int main() {
 
-   printf("%d",(int)isPalindrome());
-
+    stringManipulation();
     return 0;
 }
