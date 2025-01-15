@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <malloc.h>
 
 // -------Basic Syntax and Operations-------
 
@@ -156,13 +157,123 @@ void reverseArray()
 
 void stringManipulation()
 {
-    char string[6] = "Hello";
-    char string2[5] = "world";
+    char string[6] = "Herlo";
+    char string2[6] = "world";
 
+    // Concatenate strings
+
+    int newSize = strlen(string) + strlen(string2) + 2;
+    char newString[newSize];
+
+    int i;
+    for (i = 0; i < strlen(string); i++) {
+        newString[i] = string[i];
+    }
+
+    newString[i] = ' ';
+
+    int j = 0;
+    while (string2[j] != '\0') {
+        newString[i + 1 + j] = string2[j];
+        j++;
+    }
+
+    newString[i + 1 + j] = '\0';
+
+    printf("String 1: %s\nString 2: %s\nConcatenated string: %s\n", string, string2,newString);
+
+    // Reverse string
+    
+    char reversedString[strlen(newString) + 1];
+    reversedString[strlen(newString)] = '\0';
+    for(i = 0; i <= strlen(newString); i++)
+    {
+        reversedString[i] =  newString[strlen(newString) - i -1];
+    }
+    printf("Reversed string: %s\n",reversedString);
+
+    // Find substrings
+
+    char sub[3] = "rl";
+
+    for(i = 0; i <= strlen(newString) - strlen(sub); i++)
+    {
+        if(newString[i] == sub[0] && newString[i+1] == sub[1]) printf("Found substring on index %d\n",i);  
+    }
 }
+
+//-----Pointers-----
+
+void pointersArithmetic()
+{
+    int array[5] = {5,3,7,1,9};
+    int * arr;
+
+    arr = array;
+
+    int i;
+    for(i = 0; i<5;i++)
+    {
+        printf("Memory address: %p, value: %d\n",(void *)arr, *arr);
+        arr ++;
+    }
+
+    printf("Number of elements in array: %d",arr-array);
+}
+
+void swapByPointer()
+{
+    int a = 10;
+    int b = 20;
+    int temp;
+
+    printf("value of a: %d, value of b: %d\n", a, b);
+
+    int *pa = &a;
+    int *pb = &b;
+    temp = *pa;
+    *pa = *pb;
+    *pb = temp;
+
+    printf("after swap. value of a: %d, value of b: %d\n", a, b);
+}
+
+void dynamicAlloc()
+{
+    int* arr = malloc(sizeof(int) * 5);
+    int i;
+    int* ptr = arr;
+    for(i = 0; i < 5; i++)
+    {
+        *ptr = i*2;
+        ptr++;
+    }
+    for(i = 0; i < 5; i++)
+    {
+        printf("%d\n", arr[i]);
+    }
+    int* newArr = realloc(arr, sizeof(int) * 6);
+    if (newArr == NULL) {
+    printf("Realloc failed!\n");
+    free(arr);
+    return;
+    }
+    arr = newArr;
+        printf("After realloc:\n");
+    arr[5] = 10;
+    for(i = 0; i < 6; i++)
+    {
+        printf("%d\n", arr[i]);
+    }
+}
+
+//-----Dynamic Memory Allocation-----
+
+
 
 int main() {
 
-    stringManipulation();
+    dynamicAlloc();
+
     return 0;
 }
