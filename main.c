@@ -269,11 +269,125 @@ void dynamicAlloc()
 
 //-----Dynamic Memory Allocation-----
 
+struct Student
+{
+    int age;
+    float grade;
+    char name[50];
+};
 
+struct Student createStudent()
+{
+    struct Student s;
+
+    printf("\nInsert student name: ");
+    scanf("%s",&s.name);
+    printf("\nInsert student age: ");
+    scanf("%d",&s.age);
+    printf("\nInsert student grade: ");
+    scanf("%f",&s.grade);
+
+    return s;
+}
+
+void studentManage()
+{
+    int i,size = 2;
+    struct Student* students = malloc(size * sizeof(struct Student));
+    for(i = 0; i< size; i++)
+    {  
+        printf("\nStudent %d: ",i+1);
+        struct Student s = createStudent();
+        students[i] = s;
+    }
+
+    for(i = 0; i< size; i++)
+    {  
+        printf("\nStudent %d - Name: %s, Age: %d, Grade: %.2f\n",
+        i+1,students[i].name, students[i].age, students[i].grade);
+    }
+
+    free(students);
+}
+
+
+struct Stack {
+    int* data;  
+    int size;   
+};
+
+
+void push(struct Stack* s, int x) {
+    
+    s->size++;
+   
+    int* temp = realloc(s->data, s->size * sizeof(int));
+    if (temp == NULL) {
+        printf("Memory allocation failed during push.\n");
+        return;
+    }
+    s->data = temp;
+    s->data[s->size - 1] = x;
+}
+
+void pop(struct Stack* s) {
+    if (s->size > 0) {
+        s->size--;
+        if (s->size > 0) {
+            int* temp = realloc(s->data, s->size * sizeof(int));
+            if (temp == NULL) {
+                printf("Memory allocation failed during pop.\n");
+                return;
+            }
+            s->data = temp;
+        } else {
+
+            free(s->data);
+            s->data = NULL;
+        }
+    } else {
+        printf("Stack underflow: no elements to pop.\n");
+    }
+}
+
+void printStack(struct Stack* s) {
+    if (s->size == 0) {
+        printf("Stack is empty.\n");
+        return;
+    }
+    printf("Stack: ");
+    for (int i = 0; i < s->size; i++) {
+        printf("%d ", s->data[i]);
+    }
+    printf("\n");
+}
+
+void stackTest() {
+    
+    struct Stack s;
+    s.size = 0;
+    s.data = NULL;
+
+    push(&s, 1);
+    push(&s, 5);
+    push(&s, 10);
+    printStack(&s);
+
+    pop(&s);
+    printStack(&s);
+
+    pop(&s);
+    pop(&s);
+    printStack(&s);
+
+    free(s.data);
+}
+
+//-----File I/O-----
 
 int main() {
 
-    dynamicAlloc();
+    stackTest();
 
     return 0;
 }
