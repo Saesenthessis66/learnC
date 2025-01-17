@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
+#include <ctype.h>
 
 // -------Basic Syntax and Operations-------
 
@@ -385,9 +386,116 @@ void stackTest() {
 
 //-----File I/O-----
 
+void fileIO() {
+    char text[50];
+    printf("Insert text: ");
+    scanf("%49s", text); 
+
+    FILE* ptr = fopen("./Hello.txt", "w+");
+    if (ptr == NULL) {
+        perror("Error occurred while creating the file");
+        return;
+    }
+
+    if (fputs(text, ptr) == EOF) {
+        perror("Error writing to file");
+        fclose(ptr);
+        return;
+    }
+
+    rewind(ptr);
+
+    char string[50] = {0};
+    if (fgets(string, sizeof(string), ptr) == NULL) {
+        perror("Error reading from file");
+        fclose(ptr);
+        return;
+    }
+
+    printf("Text from file: %s\n", string);
+
+    fclose(ptr);
+}
+
+void countInFile() {
+    FILE* ptr = fopen("./Hello.txt", "r");
+    if (ptr == NULL) {
+        perror("Error opening file");
+        return;
+    }
+
+    int characters = 0, lines = 0, words = 0;
+    char c;
+    int inWord = 0; 
+
+    while ((c = fgetc(ptr)) != EOF) {
+        characters++;
+
+        if (c == '\n') {
+            lines++;
+        }
+
+        if (isspace(c)) {
+            if (inWord) {
+                words++;
+                inWord = 0; // End of a word
+            }
+        } else {
+            inWord = 1; // Inside a word
+        }
+    }
+
+    if (characters > 0 && c != '\n') {
+        lines++;
+    }
+
+    if (inWord) {
+        words++;
+    }
+
+    printf("Characters: %d, Lines: %d, Words: %d\n", characters, lines, words);
+
+    fclose(ptr);
+}
+
+#define BUF_SIZE 65536
+
+void copyFile() {
+    FILE* src = fopen("./Hello.txt", "r");
+    if (src == NULL) {
+        perror("Error opening source file");
+        return;
+    }
+
+    FILE* dest = fopen("./Hello_Copy.txt", "w");
+    if (dest == NULL) {
+        perror("Error opening destination file");
+        fclose(src);
+        return;
+    }
+
+    char buf[BUF_SIZE];
+    size_t bytesRead;
+
+    while ((bytesRead = fread(buf, 1, BUF_SIZE, src)) > 0) {
+        if (fwrite(buf, 1, bytesRead, dest) != bytesRead) {
+            perror("Error writing to destination file");
+            fclose(src);
+            fclose(dest);
+            return;
+        }
+    }
+    if (ferror(src)) {
+        perror("Error reading from source file");
+    }
+
+    fclose(src);
+    fclose(dest);
+}
+
 int main() {
 
-    stackTest();
+    copyFile();
 
     return 0;
 }
