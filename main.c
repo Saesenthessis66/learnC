@@ -557,7 +557,7 @@ void structTest()
     person.books[0] = book;
     person.books[1] = book2;
 
-    printf("\n\nName: %s, books: %s, %s",person.name,person.books[0],person.books[1]);
+    printf("\n\nName: %s, books: %s, %s",person.name,person.books[0].title,person.books[1].title);
 
     free(person.books);
     person.books = NULL;
@@ -568,6 +568,6 @@ void structTest()
 int main() {
 
     
-    
+
     return 0;
 }
