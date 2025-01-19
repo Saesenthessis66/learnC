@@ -493,9 +493,81 @@ void copyFile() {
     fclose(dest);
 }
 
+//-----Structures and Enums-----
+
+enum Day
+{
+    MONDAY = 0,
+    TUESDAY,
+    WEDNESDAY,
+    THURSDAY,
+    FRIDAY,
+    SATURDAY,
+    SUNDAY
+};
+
+void enumTest()
+{
+    int i = 0;
+    while(i<7)
+    {
+        switch (i)
+        {
+        case MONDAY:
+            printf("Monday value is: %d\n",i);
+            break;
+        case THURSDAY:
+            printf("Thursday value is: %d\n",i);
+            break;
+        default:
+            break;
+        }
+
+        i++;
+    }
+}
+
+struct Book
+{
+   char title [50];
+   char author[50];
+   float price;
+};
+
+struct Person
+{
+    struct Book* books;
+    char name[50];
+};
+
+void structTest()
+{
+    struct Book book, book2;
+    strcpy(book.author,"Pawel P");
+    strcpy(book.title,"Mongolian wars");
+    book.price = 19.99;
+    printf("Book: %s, Author: %s, price: %.2f",book.title,book.author,book.price);
+    strcpy(book2.author,"Jay Z");
+    strcpy(book2.title,"Amimir technology");
+    book2.price = 29.99;
+
+    struct Person person;
+    strcpy(person.name,"Jacob");
+    person.books = malloc(2*sizeof(struct Book));
+    person.books[0] = book;
+    person.books[1] = book2;
+
+    printf("\n\nName: %s, books: %s, %s",person.name,person.books[0],person.books[1]);
+
+    free(person.books);
+    person.books = NULL;
+}
+
+//-----Dynamic Arrays-----
+
 int main() {
 
-    copyFile();
-
+    
+    
     return 0;
 }
