@@ -626,9 +626,143 @@ void matrixMultiplication()
     free(matrix3);
 }
 
+//-----threading-----
+
+#include <pthread.h>
+#include <unistd.h>
+int num = 0;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;  // Mutex for synchronizing access to num
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;  // Condition variable to signal count1 thread
+
+// count1 thread will start when num == 5
+void* count1(void* args)
+{
+    int i = 0;
+    
+    // Wait for the signal that num is 5
+    pthread_mutex_lock(&mutex);  // Lock the mutex
+    while (num < 5) {  // Wait until num reaches 5
+        pthread_cond_wait(&cond, &mutex);  // Wait for condition variable
+    }
+    pthread_mutex_unlock(&mutex);  // Unlock the mutex
+    
+    // Once num is 5, start executing the loop
+    for (i = 0; i < 10; i++) {
+        printf("Hello from count1. %d\n", i);
+        num++;
+        sleep(1);
+    }
+    return NULL;
+}
+
+// count thread increments num and will signal count1 when num reaches 5
+void* count(void* args)
+{
+    int i = 0;
+    for (i = 0; i < 10; i++) {
+        printf("Hello from count. %d\n", i);
+        num++;
+        
+        // If num reaches 5, signal count1 to start
+        if (num == 5) {
+            pthread_mutex_lock(&mutex);
+            pthread_cond_signal(&cond);  // Signal the count1 thread
+            pthread_mutex_unlock(&mutex);
+        }
+
+        sleep(1);
+    }
+    return NULL;
+}
+
+void threads()
+{
+    pthread_t thread_id, dt;
+    
+    pthread_create(&thread_id, NULL, count, NULL);
+    
+    pthread_create(&dt, NULL, count1, NULL);
+
+    pthread_join(thread_id, NULL);
+    pthread_detach(dt);
+    
+    int i = 0;
+    for (i = 0; i < 10; i++) {
+        printf("Hello from main function. %d\n", i);
+        sleep(1);
+    }
+
+    pthread_exit(NULL);
+}
+
+struct threadData
+{
+   int* array;
+   int size;
+};
+
+
+void* calculateSum(void* args)
+{
+    struct threadData* data = (struct threadData*)args;
+    int i;
+    int *ret = malloc(sizeof(int));
+    *ret = 0;
+    for(i = 0; i < data->size; i++)
+    {
+        *ret += data->array[i];
+    }
+
+    return ret;
+}
+
+#define array_size 100
+#define thread_amount 4
+
+void calculateThreadSum()
+{
+    int sum = 0;
+
+    int* array = malloc(sizeof(int) * array_size), i;
+    int* originalArray = array;
+    for(i = 0; i < array_size; i++)
+    {
+        array[i] = 2 * i;
+    }
+
+    pthread_t t[thread_amount];
+    struct threadData d[thread_amount];
+
+    for(i = 0; i<thread_amount;i++)
+    {
+        d[i].size = array_size/thread_amount;
+        d[i].array = array + i * d[i].size;
+
+        if(pthread_create(&t[i], NULL, calculateSum,&d[i]) != 0) 
+        {
+            perror("Failed to create thread");
+            free(array);
+            return;
+        }
+    }
+
+    for ( i = 0; i < thread_amount; i++) {
+        int* partialSum;
+        if (pthread_join(t[i], (void**)&partialSum) != 0) {
+            perror("Failed to join thread");
+            free(array);
+            return;
+        }
+        sum += *partialSum;
+        free(partialSum);
+    }
+
+    printf("Sum of given array equals: %d",sum);
+    free(originalArray);
+}
+
 int main() {
 
-    matrixMultiplication();
-
+    calculateThreadSum();
     return 0;
 }
