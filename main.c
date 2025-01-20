@@ -565,9 +565,70 @@ void structTest()
 
 //-----Dynamic Arrays-----
 
+void matrixMultiplication()
+{
+    int ** matrix;
+    int ** matrix2;
+    int ** matrix3;
+    int rows = 5, columns = 5, i,j,k, sum=0;
+    matrix = malloc( rows * sizeof(int *));
+    matrix2 = malloc( rows * sizeof(int *));
+    matrix3 = malloc( rows * sizeof(int *));
+
+    for(i = 0; i < rows; i++)
+    {
+        matrix[i] = malloc( columns * sizeof(int));
+        matrix2[i] = malloc( columns * sizeof(int));
+        matrix3[i] = malloc( columns * sizeof(int));
+    }
+
+    for(i = 0; i < rows;i++)
+    {
+        for(j=0;j<columns;j++)
+        {
+            matrix[i][j] = i+j+5;
+            matrix2[i][j] = 2* i *j;
+        }
+    }
+
+    for(i = 0; i < rows;i++)
+    {
+        for(j=0;j<columns;j++)
+        {
+            sum = 0;
+            for(k = 0; k < rows; k++)
+            {
+                sum += matrix[i][k] * matrix2[k][j];
+            }
+            matrix3[i][j] = sum;
+        }
+    }
+
+    printf("Matrix 1: \t\t\t\t Matrix 2: \t\t\t\t Matrix 3:\n ");
+
+    for(i = 0; i < rows;i++)
+    {
+        for(j=0;j<columns;j++)
+        {
+            printf("%d \t %d \t %d \t",matrix[i][j],matrix2[i][j],matrix3[i][j]);
+        }
+        printf("\n");
+    }
+
+    for(i = 0; i < rows; i++)
+    {
+       free(matrix[i]);
+       free(matrix2[i]);
+       free(matrix3[i]);
+    }
+    free(matrix);
+    free(matrix2);
+    free(matrix3);
+}
+
 int main() {
 
-    
+    matrixMultiplication();
 
     return 0;
 }
