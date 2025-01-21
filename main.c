@@ -631,22 +631,19 @@ void matrixMultiplication()
 #include <pthread.h>
 #include <unistd.h>
 int num = 0;
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;  // Mutex for synchronizing access to num
-pthread_cond_t cond = PTHREAD_COND_INITIALIZER;  // Condition variable to signal count1 thread
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;  
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;  
 
-// count1 thread will start when num == 5
 void* count1(void* args)
 {
     int i = 0;
     
-    // Wait for the signal that num is 5
-    pthread_mutex_lock(&mutex);  // Lock the mutex
-    while (num < 5) {  // Wait until num reaches 5
-        pthread_cond_wait(&cond, &mutex);  // Wait for condition variable
+    pthread_mutex_lock(&mutex);  
+    while (num < 5) {  
+        pthread_cond_wait(&cond, &mutex);  
     }
-    pthread_mutex_unlock(&mutex);  // Unlock the mutex
+    pthread_mutex_unlock(&mutex);  
     
-    // Once num is 5, start executing the loop
     for (i = 0; i < 10; i++) {
         printf("Hello from count1. %d\n", i);
         num++;
@@ -655,7 +652,6 @@ void* count1(void* args)
     return NULL;
 }
 
-// count thread increments num and will signal count1 when num reaches 5
 void* count(void* args)
 {
     int i = 0;
@@ -663,10 +659,9 @@ void* count(void* args)
         printf("Hello from count. %d\n", i);
         num++;
         
-        // If num reaches 5, signal count1 to start
         if (num == 5) {
             pthread_mutex_lock(&mutex);
-            pthread_cond_signal(&cond);  // Signal the count1 thread
+            pthread_cond_signal(&cond);  
             pthread_mutex_unlock(&mutex);
         }
 
@@ -761,8 +756,133 @@ void calculateThreadSum()
     free(originalArray);
 }
 
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
+
+pthread_cond_t cond_full = PTHREAD_COND_INITIALIZER;  
+pthread_cond_t cond_empty = PTHREAD_COND_INITIALIZER;
+
+int* buffer;
+int amount = 0;      
+int buffer_size;     
+int stop = 0;        
+
+void* consume(void* args) {
+    while (1) {
+        pthread_mutex_lock(&mutex);
+
+        while (amount == 0 && !stop) {
+            pthread_cond_wait(&cond_full, &mutex);
+        }
+        if (stop) {
+            pthread_mutex_unlock(&mutex);
+            break;
+        }
+
+        printf("Consuming value: %d\n", buffer[amount - 1]);
+        amount--;
+
+        pthread_cond_signal(&cond_empty);
+
+        pthread_mutex_unlock(&mutex);
+        sleep(1);  
+    }
+    return NULL;
+}
+
+void* produce(void* args) {
+    while (1) {
+        pthread_mutex_lock(&mutex);
+
+        while (amount == buffer_size && !stop) {
+            pthread_cond_wait(&cond_empty, &mutex);
+        }
+        if (stop) {
+            pthread_mutex_unlock(&mutex);
+            break;
+        }
+
+        int item = rand() % 100;  
+        buffer[amount] = item;
+        printf("Producing value: %d\n", item);
+        amount++;
+
+        pthread_cond_signal(&cond_full);
+
+        pthread_mutex_unlock(&mutex);
+        sleep(1);  
+    }
+    return NULL;
+}
+
+void producerConsumer() {
+    int producers, consumers, i;
+
+    printf("Insert number of producers: ");
+    scanf("%d", &producers);
+    printf("Insert number of consumers: ");
+    scanf("%d", &consumers);
+    printf("Insert size of buffer: ");
+    scanf("%d", &buffer_size);
+
+    buffer = malloc(buffer_size * sizeof(int));
+    pthread_t* prod_threads = malloc(sizeof(pthread_t) * producers);
+    pthread_t* cons_threads = malloc(sizeof(pthread_t) * consumers);
+
+    srand(time(NULL));  
+
+
+    for (i = 0; i < producers; i++) {
+        if (pthread_create(&prod_threads[i], NULL, produce, NULL) != 0) {
+            perror("Failed to create producer thread");
+            free(buffer);
+            free(prod_threads);
+            free(cons_threads);
+            return;
+        }
+    }
+
+    for (i = 0; i < consumers; i++) {
+        if (pthread_create(&cons_threads[i], NULL, consume, NULL) != 0) {
+            perror("Failed to create consumer thread");
+            free(buffer);
+            free(prod_threads);
+            free(cons_threads);
+            return;
+        }
+    }
+
+    sleep(10);
+    stop = 1;  
+
+    pthread_mutex_lock(&mutex);
+    pthread_cond_broadcast(&cond_full);
+    pthread_cond_broadcast(&cond_empty);
+    pthread_mutex_unlock(&mutex);
+
+    for (i = 0; i < producers; i++) {
+        pthread_join(prod_threads[i], NULL);
+    }
+    for (i = 0; i < consumers; i++) {
+        pthread_join(cons_threads[i], NULL);
+    }
+
+    free(buffer);
+    free(prod_threads);
+    free(cons_threads);
+    pthread_mutex_destroy(&mutex);
+    pthread_cond_destroy(&cond_full);
+    pthread_cond_destroy(&cond_empty);
+
+    printf("Producer-consumer simulation finished.\n");
+}
+
+
 int main() {
 
-    calculateThreadSum();
+    producerConsumer();
     return 0;
 }
