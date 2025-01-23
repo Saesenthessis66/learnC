@@ -880,9 +880,104 @@ void producerConsumer() {
     printf("Producer-consumer simulation finished.\n");
 }
 
+//-----Algorithms and Data Structures-----
+
+struct node
+{
+    int data;
+    struct node* next;
+    struct node* previous;
+};
+
+struct linkedList
+{
+    int size;
+    struct node* head;
+};
+
+void push_back(struct linkedList* list, int value)
+{
+    if(list->head == NULL)
+    {
+        struct node* node = malloc(sizeof(struct node));
+        node->data = value;
+        node->next = NULL;
+        node->previous = NULL;
+        list->head = node;
+        list->size = 1;
+    }
+    else
+    {
+        struct node* node = list->head;
+        while(node->next != NULL)
+        {
+            node = node->next;
+        } 
+        struct node* element =  malloc(sizeof(struct node));
+        element->data = value;
+        element->next = NULL;
+        element->previous = node;
+        node->next = element;
+        list->size++;
+    }
+}
+
+void pop_back(struct linkedList* list) {
+    if (list->size == 0) {
+        printf("Cannot pop from an empty list!\n");
+        return;
+    }
+    if (list->size == 1) {
+        free(list->head);
+        list->head = NULL;
+    } else {
+        struct node* current = list->head;
+        while (current->next != NULL) {
+            current = current->next;
+        }
+        current->previous->next = NULL;
+        free(current);
+    }
+    list->size--;
+}
+
+void printList(struct linkedList* list)
+{
+    struct node* node = list->head;
+    int i;
+    printf("Element: %d value: %d\n",i,node->data);
+    while(node->next != NULL)
+    {
+        node = node->next;
+        i++;
+        printf("Element: %d value: %d\n",i,node->data);
+    } 
+}
+
+void push_front(struct linkedList* list, int value);
+
+void pop_front(struct linkedList* list);
+
+struct node* find(struct linkedList* list, int value);
+
+void delete(struct linkedList* list, int value);
+
+void reverse_print(struct linkedList* list);
+
+void clear(struct linkedList* list);
 
 int main() {
 
-    producerConsumer();
+    struct linkedList list = {0, NULL};
+
+    push_back(&list,5);
+    push_back(&list,4);
+    push_back(&list,3);
+
+    printList(&list);
+
+    pop_back(&list);
+    printList(&list);
+
     return 0;
 }
