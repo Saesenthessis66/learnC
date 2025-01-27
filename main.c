@@ -944,7 +944,7 @@ void pop_back(struct linkedList* list) {
 void printList(struct linkedList* list)
 {
     struct node* node = list->head;
-    int i;
+    int i = 0;
     printf("Element: %d value: %d\n",i,node->data);
     while(node->next != NULL)
     {
@@ -954,11 +954,64 @@ void printList(struct linkedList* list)
     } 
 }
 
-void push_front(struct linkedList* list, int value);
+void push_front(struct linkedList* list, int value)
+{
+    if(list->head == NULL)
+    {
+        struct node* node = malloc(sizeof(struct node));
+        node->data = value;
+        node->next = NULL;
+        node->previous = NULL;
+        list->head = node;
+        list->size = 1;
+    }
+    else
+    {
+        struct node* newHead = malloc(sizeof(struct node));
+        struct node* node = list->head;
+        newHead->data =  value;
+        newHead->next = node;
+        node->previous = newHead;
+        list->head = newHead;
+        list->size++;
+    }
+}
 
-void pop_front(struct linkedList* list);
+void pop_front(struct linkedList* list)
+{
+    if (list->head == NULL)
+    {
+        printf("Empty list cannot be front popped!\n");
+        return;
+    }
 
-struct node* find(struct linkedList* list, int value);
+    if (list->size == 1)
+    {
+        free(list->head);
+        list->head = NULL;
+        list->size = 0;  
+        return;
+    }
+
+    struct node* oldHead = list->head;         
+    list->head = list->head->next;            
+    list->head->previous = NULL;             
+    free(oldHead);                           
+    list->size--;                             
+}
+
+struct node* find(struct linkedList* list, int value)
+{
+    struct node* head = list->head;
+    while(head->next != NULL)
+    {
+        if(head->data == value) return head;
+        head = head->next;
+    }
+    if(head->data == value) return head;
+    printf("Value not found!");
+    return NULL;
+}
 
 void delete(struct linkedList* list, int value);
 
@@ -975,9 +1028,25 @@ int main() {
     push_back(&list,3);
 
     printList(&list);
+    printf("\n");
 
     pop_back(&list);
     printList(&list);
+    printf("\n");
+
+    push_front(&list,3);
+    printList(&list);
+    printf("\n");
+
+    pop_front(&list);
+    printList(&list);
+    printf("\n");
+
+    struct node* val = find(&list,4);
+    printf("Address of value: %p\n",val);
+    val->data = 10;
+    printList(&list);
+    printf("\n");
 
     return 0;
 }
