@@ -943,6 +943,11 @@ void pop_back(struct linkedList* list) {
 
 void printList(struct linkedList* list)
 {
+    if(list->size == 0) 
+    {
+        printf("List is empty.");
+        return;
+    }
     struct node* node = list->head;
     int i = 0;
     printf("Element: %d value: %d\n",i,node->data);
@@ -1013,14 +1018,85 @@ struct node* find(struct linkedList* list, int value)
     return NULL;
 }
 
-void delete(struct linkedList* list, int value);
+void delete(struct linkedList* list, int value)
+{
+    struct node* head = list->head;
 
-void reverse_print(struct linkedList* list);
+    while (head != NULL)  
+    {
+        if (head->data == value) 
+        {
+            struct node* nodeToDelete = head;
+            if (head == list->head)  
+            {
+                list->head = head->next;  
+                if (list->head != NULL)   
+                    list->head->previous = NULL;
+            }
+            else 
+            {
+                head->previous->next = head->next; 
+                if (head->next != NULL) 
+                    head->next->previous = head->previous; 
+            }
 
-void clear(struct linkedList* list);
+            free(nodeToDelete); 
+            list->size--;       
+            return;            
+        }
+        head = head->next;
+    }
 
-int main() {
+    printf("Value not found!\n");
+}
 
+void reverse_print(struct linkedList* list)
+{
+    if (list->head == NULL) 
+    {
+        printf("List is empty!\n");
+        return;
+    }
+
+    struct node* current = list->head;
+    int i = list->size - 1;  
+
+    while (current->next != NULL)
+    {
+        current = current->next;
+    }
+
+    while (current != NULL)
+    {
+        printf("Element: %d, Value: %d\n", i, current->data);
+        i--;
+        current = current->previous;
+    }
+}
+
+void clear(struct linkedList* list)
+{
+    if (list->head == NULL) 
+    {
+        return;
+    }
+
+    struct node* current = list->head;
+    struct node* nextNode;
+
+    while (current != NULL) 
+    {
+        nextNode = current->next;
+        free(current);           
+        current = nextNode;       
+    }
+
+    list->head = NULL; 
+    list->size = 0;    
+}
+
+void linkedListTest()
+{
     struct linkedList list = {0, NULL};
 
     push_back(&list,5);
@@ -1047,6 +1123,122 @@ int main() {
     val->data = 10;
     printList(&list);
     printf("\n");
+
+    printList(&list);
+    printf("\n");
+    delete(&list,5);
+    printList(&list);
+    printf("\n");
+
+    push_back(&list,5);
+    push_back(&list,4);
+    push_back(&list,3);
+
+    printList(&list);
+    printf("\n");
+
+    reverse_print(&list);
+    printf("\n");
+
+    clear(&list);
+    printList(&list);
+    printf("\n");
+}
+
+struct Queue {
+    int* array;
+    int capacity;
+    int front;
+    int rear;
+    int size;
+};
+
+void initQueue(struct Queue* q, int cap)
+{
+    q->capacity = cap;
+    q->array = malloc(sizeof(int) * cap);
+    q->size = 0;
+    q->front = 0;
+    q->rear = -1; 
+}
+
+void enqueue(struct Queue* q, int val)
+{
+    if (q->size == q->capacity)
+    {
+        printf("Queue overflow! Cannot enqueue %d\n", val);
+        return;
+    }
+    
+    q->rear = (q->rear + 1) % q->capacity; 
+    q->array[q->rear] = val;
+    q->size++;
+
+    printf("Enqueued: %d\n", val);
+}
+
+int dequeue(struct Queue* q)
+{
+    if (q->size == 0)
+    {
+        printf("Queue underflow! Cannot dequeue\n");
+        return -1;
+    }
+
+    int val = q->array[q->front]; 
+    q->front = (q->front + 1) % q->capacity; 
+    q->size--;
+
+    return val;
+}
+
+void printQueue(struct Queue* q)
+{
+    if (q->size == 0)
+    {
+        printf("Queue is empty\n");
+        return;
+    }
+
+    printf("Queue elements: ");
+    for (int i = 0; i < q->size; i++)
+    {
+        int index = (q->front + i) % q->capacity;
+        printf("%d ", q->array[index]);
+    }
+    printf("\n");
+}
+
+void freeQueue(struct Queue* q)
+{
+    free(q->array);
+}
+
+void testQueue()
+{
+    struct Queue q;
+    initQueue(&q, 5);
+
+    enqueue(&q, 10);
+    enqueue(&q, 20);
+    enqueue(&q, 30);
+
+    printQueue(&q);
+
+    printf("Dequeued: %d\n", dequeue(&q));
+    printQueue(&q);
+
+    enqueue(&q, 40);
+    enqueue(&q, 50);
+    enqueue(&q, 60); 
+    enqueue(&q, 70); 
+
+    printQueue(&q);
+
+    freeQueue(&q);
+}
+
+int main() {
 
     return 0;
 }
