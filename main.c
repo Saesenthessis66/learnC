@@ -1238,7 +1238,81 @@ void testQueue()
     freeQueue(&q);
 }
 
+struct TreeNode
+{
+    int val;
+    struct TreeNode* left;
+    struct TreeNode* right;
+};
+
+struct TreeNode* createNode(int value)
+{
+    struct TreeNode* node = malloc(sizeof(struct TreeNode));
+    node->val = value;
+    node->right = NULL;
+    node->left = NULL;
+
+    return node;
+}
+struct TreeNode* insert(struct TreeNode* root, int value)
+{
+    struct TreeNode* node = root;
+
+    if(root == NULL)
+    {
+        root = createNode(value);
+        return root;
+    } 
+
+    while(1)
+    {
+        if(node->val >= value)
+        {
+            if(node->left != NULL)
+            {
+                node = node->left;
+            }
+            else
+            {
+                node->left = createNode(value);
+                return root;
+            }
+        }
+        else
+        {
+            if(node->right != NULL)
+            {
+                node = node->right;
+            }
+            else
+            {
+                node->right = createNode(value);
+                return root;
+            }
+        }
+    }
+}
+// struct TreeNode* delete(struct TreeNode* root, int value)
+// {
+    
+// }
+// struct TreeNode* findMin(struct TreeNode* root);
+// struct TreeNode* findMax(struct TreeNode* root);
+// struct TreeNode* search(struct TreeNode* root, int value);
+// void inOrderTraversal(struct TreeNode* root);
+// void preOrderTraversal(struct TreeNode* root);
+// void postOrderTraversal(struct TreeNode* root);
+// void destroyTree(struct TreeNode* root);
+
+void BST()
+{
+    struct TreeNode* root = createNode(5);
+    insert(root,6);
+}
+
 int main() {
+
+    BST();
 
     return 0;
 }
