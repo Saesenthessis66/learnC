@@ -1348,7 +1348,27 @@ struct TreeNode* delete(struct TreeNode* root, int value) {
     return root;
 }
 
-// struct TreeNode* search(struct TreeNode* root, int value);
+struct TreeNode* search(struct TreeNode* root, int value)
+{
+    if(root == NULL)
+    {
+        printf("Value %d not found.",value);
+        return NULL;
+    }
+    int val = root->val;
+    if(val > value)
+    {
+        search(root->left,val);
+    }
+    else if(val < value)
+    {
+       search(root->right,val);
+    }
+    else 
+    {
+        return root;
+    }
+}
 
 void inOrderTraversal(struct TreeNode* root)
 {
@@ -1358,14 +1378,35 @@ void inOrderTraversal(struct TreeNode* root)
     inOrderTraversal(root->right);
 }
 
-// void preOrderTraversal(struct TreeNode* root);
-// void postOrderTraversal(struct TreeNode* root);
-// void destroyTree(struct TreeNode* root);
+void preOrderTraversal(struct TreeNode* root)
+{
+    if(root == NULL) return;
+    printf("%d ",root->val);
+    preOrderTraversal(root->left);
+    preOrderTraversal(root->right);
+}
+
+void postOrderTraversal(struct TreeNode* root)
+{
+    if(root == NULL) return;
+    postOrderTraversal(root->left);
+    postOrderTraversal(root->right);
+    printf("%d ",root->val);
+}
+
+void destroyTree(struct TreeNode* root)
+{
+    if(root == NULL) return;
+    destroyTree(root->left);
+    destroyTree(root->right);
+    free(root);
+}
 
 void BST()
 {
     struct TreeNode* root = NULL;
 
+    printf("Inserting values: 50, 30, 70, 20, 40, 60, 80\n");
     root = insert(root, 50);
     root = insert(root, 30);
     root = insert(root, 70);
@@ -1374,15 +1415,49 @@ void BST()
     root = insert(root, 60);
     root = insert(root, 80);
 
-    printf("Inorder before deletion: ");
+    printf("\nInOrder Traversal (Should be sorted): ");
     inOrderTraversal(root);
     printf("\n");
 
-    root = delete(root, 50); 
+    printf("\nPreOrder Traversal: ");
+    preOrderTraversal(root);
+    printf("\n");
 
-    printf("Inorder after deletion: ");
+    printf("\nPostOrder Traversal: ");
+    postOrderTraversal(root);
+    printf("\n");
+
+    printf("\nFinding min: ");
+    struct TreeNode* minNode = findMin(root);
+    if (minNode) printf("%d\n", minNode->val);
+
+    printf("Finding max: ");
+    struct TreeNode* maxNode = findMax(root);
+    if (maxNode) printf("%d\n", maxNode->val);
+
+    printf("\nSearching for 40: ");
+    struct TreeNode* found = search(root, 40);
+    if (found) printf("Found %d\n", found->val);
+    else printf("Not found\n");
+
+    root = delete(root, 20);
+    printf("InOrder Traversal after deletion: ");
     inOrderTraversal(root);
     printf("\n");
+
+    root = delete(root, 30);
+    printf("InOrder Traversal after deletion: ");
+    inOrderTraversal(root);
+    printf("\n");
+
+    root = delete(root, 50);
+    printf("InOrder Traversal after deletion: ");
+    inOrderTraversal(root);
+    printf("\n");
+
+    destroyTree(root);
+    root = NULL;
+    printf("Tree destroyed.\n");
 }
 
 int main() {
