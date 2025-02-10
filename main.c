@@ -1018,7 +1018,7 @@ struct node* find(struct linkedList* list, int value)
     return NULL;
 }
 
-void delete(struct linkedList* list, int value)
+void linkedListDelete(struct linkedList* list, int value)
 {
     struct node* head = list->head;
 
@@ -1126,7 +1126,7 @@ void linkedListTest()
 
     printList(&list);
     printf("\n");
-    delete(&list,5);
+    linkedListDelete(&list,5);
     printList(&list);
     printf("\n");
 
@@ -1254,60 +1254,135 @@ struct TreeNode* createNode(int value)
 
     return node;
 }
-struct TreeNode* insert(struct TreeNode* root, int value)
+
+struct TreeNode* insert(struct TreeNode* root, int value) 
+{
+    if (root == NULL)
+    {
+        return createNode(value);
+    }
+
+    if (value < root->val)
+    {
+        root->left = insert(root->left, value);
+    }
+    else if (value > root->val)
+    {
+        root->right = insert(root->right, value);
+    }
+
+    return root;
+}
+
+struct TreeNode* findMin(struct TreeNode* root)
 {
     struct TreeNode* node = root;
-
     if(root == NULL)
     {
-        root = createNode(value);
-        return root;
-    } 
-
-    while(1)
-    {
-        if(node->val >= value)
-        {
-            if(node->left != NULL)
-            {
-                node = node->left;
-            }
-            else
-            {
-                node->left = createNode(value);
-                return root;
-            }
-        }
-        else
-        {
-            if(node->right != NULL)
-            {
-                node = node->right;
-            }
-            else
-            {
-                node->right = createNode(value);
-                return root;
-            }
-        }
+        printf("BST is empty.");
+        return NULL;
     }
+    if(root->left == NULL)
+    {
+        return root;
+    }
+    findMin(root->left);
 }
-// struct TreeNode* delete(struct TreeNode* root, int value)
-// {
-    
-// }
-// struct TreeNode* findMin(struct TreeNode* root);
-// struct TreeNode* findMax(struct TreeNode* root);
+
+struct TreeNode* findMax(struct TreeNode* root)
+{
+    struct TreeNode* node = root;
+    if(root == NULL)
+    {
+        printf("BST is empty.");
+        return NULL;
+    }
+    if(root->right == NULL)
+    {
+        return root;
+    }
+    findMin(root->right);
+}
+
+struct TreeNode* delete(struct TreeNode* root, int value) {
+
+    if (root == NULL)
+    {
+        printf("Tree is empty or value is not in tree.\n");
+        return root;
+    }
+
+    int val = root->val;
+    if(val > value)
+    {
+        root->left = delete(root->left,value);
+    }
+    else if(val < value)
+    {
+       root->right = delete(root->right,value);
+    }
+    else 
+    {
+        if(root->left == NULL && root->right == NULL)
+        {
+            free(root);
+            return NULL;
+        }
+        if(root->left == NULL)
+        {
+            struct TreeNode* temp = root->right;
+            free(root);
+            return temp;
+        }
+        if(root->right == NULL)
+        {
+            struct TreeNode* temp = root->left;
+            free(root);
+            return temp;
+        }
+
+        struct TreeNode* successor = findMin(root->right);
+        root->val = successor->val;
+        root->right = delete(root->right, successor->val);
+    }
+    return root;
+}
+
 // struct TreeNode* search(struct TreeNode* root, int value);
-// void inOrderTraversal(struct TreeNode* root);
+
+void inOrderTraversal(struct TreeNode* root)
+{
+    if (root == NULL) return;
+    inOrderTraversal(root->left);
+    printf("%d ", root->val);
+    inOrderTraversal(root->right);
+}
+
 // void preOrderTraversal(struct TreeNode* root);
 // void postOrderTraversal(struct TreeNode* root);
 // void destroyTree(struct TreeNode* root);
 
 void BST()
 {
-    struct TreeNode* root = createNode(5);
-    insert(root,6);
+    struct TreeNode* root = NULL;
+
+    root = insert(root, 50);
+    root = insert(root, 30);
+    root = insert(root, 70);
+    root = insert(root, 20);
+    root = insert(root, 40);
+    root = insert(root, 60);
+    root = insert(root, 80);
+
+    printf("Inorder before deletion: ");
+    inOrderTraversal(root);
+    printf("\n");
+
+    root = delete(root, 50); 
+
+    printf("Inorder after deletion: ");
+    inOrderTraversal(root);
+    printf("\n");
 }
 
 int main() {
